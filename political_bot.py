@@ -242,8 +242,7 @@ if manual_query:
 if run_button:
     with st.spinner("Fetching political and geopolitical news..."):
         rss_articles = fetch_rss_news()
-        gdelt_articles = fetch_gdelt_news(search_query)
-        all_articles = gdelt_articles + rss_articles
+        all_articles = rss_articles
 
     if not all_articles:
         st.error("No news found.")
