@@ -58,15 +58,35 @@ def fetch_gdelt_news(query, max_records=25):
     }
 
     try:
-        response = requests.get(GDELT_URL, params=params, timeout=15)
-        data = response.json()
+        response = requests.get(
+            GDELT_URL,
+            params=params,
+            timeout=20,
+            headers={
+                "User-Agent": "Mozilla/5.0"
+            }
+        )
+
+        if response.status_code != 200:
+            st.warning(f"GDELT returned HTTP {response.status_code}")
+            return []
+
+        if not response.text.strip():
+            st.warning("GDELT returned empty response.")
+            return []
+
+        try:
+            data = response.json()
+        except Exception:
+            st.warning("GDELT did not return valid JSON. Skipping GDELT.")
+            return []
 
         articles = []
         for item in data.get("articles", []):
             articles.append({
                 "source": item.get("sourceCountry", "GDELT"),
                 "title": item.get("title", ""),
-                "summary": item.get("seendate", ""),
+                "summary": item.get("domain", ""),
                 "link": item.get("url", ""),
                 "published": item.get("seendate", "")
             })
